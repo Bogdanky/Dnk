@@ -27,12 +27,18 @@ for (const file of commandFiles) {
     }
 }
 
-client.once('ready', () => {
+client.once('clientReady', () => {
     console.log(`Botto e online ca ${client.user.tag}`);
     client.user.setPresence({
         activities: [{ name: `${client.guilds.cache.size} servere`, type: ActivityType.Watching }],
         status: 'online',
     });
+
+    // Verifica din 30 in 30 de secunde daca vreun giveaway a expirat si trebuie incheiat automat.
+    const giveawayCommand = client.commands.get('giveaway');
+    if (giveawayCommand?.checkExpiredGiveaways) {
+        setInterval(() => giveawayCommand.checkExpiredGiveaways(client), 30_000);
+    }
 });
 
 client.on('interactionCreate', async interaction => {
