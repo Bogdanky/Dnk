@@ -10,6 +10,27 @@ async function steamJson(url) {
 	return response.json();
 }
 
+async function getLowestPrice(appId) {
+    try {
+        // CheapShark oferă căutare directă după Steam App ID
+        const response = await fetch(`https://www.cheapshark.com/api/1.0/games?steamAppID=${appId}`, {
+            signal: AbortSignal.timeout(4000)
+        });
+        
+        if (!response.ok) return 'Nedisponibil';
+        
+        const data = await response.json();
+        // CheapShark returnează un array; luăm primul rezultat (meciul exact)
+        if (data && data.length > 0 && data[0].cheapestPriceEver) {
+            return `$${data[0].cheapestPriceEver.price}`;
+        }
+        
+        return 'Nedisponibil';
+    } catch (_) {
+        return 'Nedisponibil';
+    }
+}
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('game')
@@ -49,6 +70,7 @@ module.exports = {
 			}
 
 			const price = game.is_free ? 'Gratuit' : (game.price_overview?.final_formatted || 'Nedisponibil');
+			const pastPrice = game.is_free ? 'Gratuit' : await steamDbLowestPrice(appId);
 			const metascore = game.metacritic?.score ? `${game.metacritic.score}/100` : 'Nedisponibil';
 			const description = (game.short_description || 'Fără descriere.')
 				.replace(/<[^>]*>/g, '')
@@ -61,6 +83,7 @@ module.exports = {
 				.setDescription(description)
 				.addFields(
 					{ name: 'Preț', value: price, inline: true },
+					{ name: 'Past price', value: pastPrice, inline: true },
 					{ name: 'Reviews', value: reviews, inline: true },
 					{ name: 'Metascore', value: metascore, inline: true }
 				)
