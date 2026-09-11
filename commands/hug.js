@@ -23,18 +23,25 @@ module.exports = {
         await interaction.deferReply();
 
         try {
-            const response = await fetch('https://api.waifu.pics/sfw/hug');
+            const response = await fetch('https://nekos.best/api/v2/hug', {
+                headers: { 'User-Agent': 'DnkBot/1.0 (https://discord.com)' },
+            });
 
             if (!response.ok) {
-                throw new Error(`API-ul waifu.pics a raspuns cu status ${response.status}`);
+                throw new Error(`API-ul nekos.best a raspuns cu status ${response.status}`);
             }
 
             const data = await response.json();
+            const result = data.results[0];
 
             const embed = new EmbedBuilder()
                 .setDescription(`${interaction.user} o imbratiseaza pe ${target}! 🤗`)
-                .setImage(data.url)
+                .setImage(result.url)
                 .setColor(0xF783AC);
+
+            if (result.anime_name) {
+                embed.setFooter({ text: `Sursa: ${result.anime_name}` });
+            }
 
             await interaction.editReply({ content: `${target}`, embeds: [embed] });
         } catch (error) {
