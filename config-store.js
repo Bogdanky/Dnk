@@ -24,6 +24,14 @@ function getGuildConfig(guildId) {
     return {
         modRoleId: process.env.MOD_ROLE_ID || null,
         categoryId: process.env.TICKET_CATEGORY_ID || null,
+        nsfwFilterEnabled: false,
+        prefix: '!',
+        logChannelId: null,
+        welcomeChannelId: null,
+        welcomeMessage: null,
+        autoRoleId: null,
+        starboardChannelId: null,
+        starThreshold: 3,
         ...all[guildId],
     };
 }
