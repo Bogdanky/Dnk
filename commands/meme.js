@@ -12,7 +12,7 @@ module.exports = {
             const response = await fetch('https://meme-api.com/gimme');
 
             if (!response.ok) {
-                throw new Error(`API-ul de meme-uri a raspuns cu status ${response.status}`);
+                throw new Error(`API-ul de meme-uri a raspuns cu status ${response.status}, si nu am gasit meme-uri.`);
             }
 
             const meme = await response.json();
