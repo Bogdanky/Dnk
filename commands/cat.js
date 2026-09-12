@@ -18,7 +18,7 @@ module.exports = {
             const [data] = await response.json();
 
             const embed = new EmbedBuilder()
-                .setTitle('🐱 Meow!')
+                .setTitle('🐱 Miauuuuuuuuuu!')
                 .setImage(data.url)
                 .setColor(0xFF9900);
 

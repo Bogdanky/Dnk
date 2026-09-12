@@ -47,7 +47,7 @@ function buildStandingsEmbed({ season, driverStandings, constructorStandings }) 
             { name: 'Piloti', value: driversText, inline: true },
             { name: 'Constructori', value: constructorsText, inline: true },
         )
-        .setFooter({ text: 'Sursa: Jolpica-F1 (succesorul Ergast)' })
+        .setFooter({ text: 'Sursa: Jolpica-F1' })
         .setTimestamp();
 }
 

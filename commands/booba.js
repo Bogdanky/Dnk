@@ -25,10 +25,10 @@ module.exports = {
         const legend = LEGENDS[Math.floor(Math.random() * LEGENDS.length)];
 
         const embed = new EmbedBuilder()
-            .setTitle('Random Booba of the Day')
-            .setDescription(`Astazi castiga **${legend}**`)
-            .setColor(0xF36A12);
+                .setTitle('🐱 Miauuuuuuuuuu!')
+                .setImage(data.url)
+                .setColor(0xFF9900);
 
-        await interaction.reply({ embeds: [embed], ephemeral: true });
+            await interaction.editReply({ embeds: [embed] });
     },
 };
