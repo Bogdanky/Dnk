@@ -70,6 +70,10 @@ client.once('clientReady', () => {
             console.error(`Eroare la actualizarea clasamentului F1 pentru serverul ${guildId}:`, error),
         );
     }
+    setInterval(() => {
+    console.log('Auto-restart dupa 1 ora...');
+    process.exit(0);
+    }, 3600000);
 });
 
 // ---------- Slash commands + butonul de tichet ----------
