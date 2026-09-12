@@ -1,7 +1,11 @@
 # Changelog - Dnk Bot
 
 Istoricul modificarilor botului, de la rescrierea initiala din discord.js v14 pana acum.
+## [2.7.0]
 
+### Adaugat
+| `/f1standings setup canal` | Configureaza canalul si posteaza clasamentul F1 (Admin) |
+| `/f1standings refresh` | Actualizeaza manual clasamentul F1 (Admin) |
 ## [2.6.0]
 
 ### Adaugat

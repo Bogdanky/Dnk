@@ -154,6 +154,8 @@ Fara ele, botul nu se conecteaza deloc (Discord respinge intent-urile nedeclarat
 | `/config log-channel` | Canal pentru audit log |
 | `/config starboard` | Canal + prag pentru starboard |
 | `/config prefix` | Prefixul pentru prefix commands |
+| `/f1standings setup canal` | Configureaza canalul si posteaza clasamentul F1 (Admin) |
+| `/f1standings refresh` | Actualizeaza manual clasamentul F1 (Admin) |
 | `/config show` | Afiseaza toata configuratia curenta |
 
 ### Dezvoltare (owner only)
