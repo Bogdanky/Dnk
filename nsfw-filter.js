@@ -1,5 +1,5 @@
 const RAPIDAPI_HOST = 'nsfw3.p.rapidapi.com';
-const THRESHOLD = 0.85; // scor de la 0 la 1; peste asta consideram imaginea NSFW
+const THRESHOLD = 0.60; // scor de la 0 la 1; peste asta consideram imaginea NSFW
 
 /**
  * Verifica o imagine (prin URL) folosind API-ul api4ai/nsfw3 de pe RapidAPI.

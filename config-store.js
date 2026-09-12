@@ -1,7 +1,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
-const dataDir = path.join(__dirname, '..', 'data');
+const dataDir = path.join(__dirname, 'data');
 const configPath = path.join(dataDir, 'ticket-config.json');
 
 function loadAll() {
@@ -32,6 +32,8 @@ function getGuildConfig(guildId) {
         autoRoleId: null,
         starboardChannelId: null,
         starThreshold: 3,
+        f1StandingsChannelId: null,
+        f1StandingsMessageId: null,
         ...all[guildId],
     };
 }
@@ -43,4 +45,8 @@ function setGuildConfig(guildId, updates) {
     return all[guildId];
 }
 
-module.exports = { getGuildConfig, setGuildConfig };
+function getAllGuildIds() {
+    return Object.keys(loadAll());
+}
+
+module.exports = { getGuildConfig, setGuildConfig, getAllGuildIds };

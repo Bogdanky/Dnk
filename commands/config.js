@@ -55,6 +55,14 @@ module.exports = {
                         .setRequired(true)
                         .setMaxLength(3)))
         .addSubcommand(sub =>
+            sub.setName('f1-channel')
+                .setDescription('Seteaza canalul cu clasamentul F1 (mesaj auto-actualizat)')
+                .addChannelOption(opt =>
+                    opt.setName('canal')
+                        .setDescription('Canalul unde se posteaza clasamentul')
+                        .addChannelTypes(ChannelType.GuildText)
+                        .setRequired(true)))
+        .addSubcommand(sub =>
             sub.setName('show')
                 .setDescription('Arata configuratia curenta a botului pentru acest server')),
 
@@ -99,6 +107,15 @@ module.exports = {
             return interaction.reply({ content: `Prefixul alternativ e acum: \`${text}\``, ephemeral: true });
         }
 
+        if (sub === 'f1-channel') {
+            const channel = interaction.options.getChannel('canal', true);
+            setGuildConfig(guildId, { f1StandingsChannelId: channel.id, f1StandingsMessageId: null });
+            return interaction.reply({
+                content: `Canal F1 setat: ${channel}. Ruleaza \`/f1standings\` ca sa postezi primul mesaj, sau asteapta urmatorul restart al botului.`,
+                ephemeral: true,
+            });
+        }
+
         if (sub === 'show') {
             const config = getGuildConfig(guildId);
             const embed = new EmbedBuilder()
@@ -113,6 +130,7 @@ module.exports = {
                     { name: 'Autorole', value: config.autoRoleId ? `<@&${config.autoRoleId}>` : 'nesetat', inline: true },
                     { name: 'Canal log', value: config.logChannelId ? `<#${config.logChannelId}>` : 'nesetat', inline: true },
                     { name: 'Starboard', value: config.starboardChannelId ? `<#${config.starboardChannelId}> (prag ${config.starThreshold})` : 'nesetat', inline: true },
+                    { name: 'Canal F1', value: config.f1StandingsChannelId ? `<#${config.f1StandingsChannelId}>` : 'nesetat', inline: true },
                 );
             return interaction.reply({ embeds: [embed], ephemeral: true });
         }

@@ -11,12 +11,13 @@ const {
     EmbedBuilder,
 } = require('discord.js');
 
-const { getGuildConfig } = require('./config-store');
+const { getGuildConfig, getAllGuildIds } = require('./config-store');
 const { isImageNsfw } = require('./nsfw-filter');
 const { sendLog, baseEmbed, fetchExecutor } = require('./audit-log');
 const { getRoleForReaction } = require('./reaction-role-store');
 const { getStarboardEntry, setStarboardEntry } = require('./starboard-store');
 const { prefixCommands } = require('./prefix-commands');
+const { refreshStandingsMessage } = require('./f1-standings');
 
 const client = new Client({
     intents: [
@@ -61,6 +62,13 @@ client.once('clientReady', () => {
     const giveawayCommand = client.commands.get('giveaway');
     if (giveawayCommand?.checkExpiredGiveaways) {
         setInterval(() => giveawayCommand.checkExpiredGiveaways(client), 30_000);
+    }
+
+    // La fiecare pornire/restart, actualizeaza (sterge + reposteaza) clasamentul F1 pe fiecare server configurat.
+    for (const guildId of getAllGuildIds()) {
+        refreshStandingsMessage(client, guildId).catch(error =>
+            console.error(`Eroare la actualizarea clasamentului F1 pentru serverul ${guildId}:`, error),
+        );
     }
 });
 
