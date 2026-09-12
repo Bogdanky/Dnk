@@ -70,9 +70,17 @@ client.once('clientReady', () => {
             console.error(`Eroare la actualizarea clasamentului F1 pentru serverul ${guildId}:`, error),
         );
     }
-    setInterval(() => {
-    console.log('Auto-restart dupa 1 ora...');
-    process.exit(0);
+    setInterval(async () => {
+        console.log('🔄 Auto-restart dupa 1 ora - deconectez si reconectez...');
+        try {
+            await client.destroy();
+            // Asteapta 2 secunde, apoi reconnect
+            setTimeout(() => {
+                client.login(process.env.DISCORD_TOKEN);
+            }, 2000);
+        } catch (error) {
+            console.error('Eroare la auto-restart:', error);
+        }
     }, 3600000);
 });
 
