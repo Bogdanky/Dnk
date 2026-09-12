@@ -17,7 +17,7 @@ async function getLowestPrice(appId) {
             signal: AbortSignal.timeout(4000)
         });
         
-        if (!response.ok) return 'Nedisponibil';
+        if (!response.ok) return 'Indisponibil';
         
         const data = await response.json();
         // CheapShark returnează un array; luăm primul rezultat (meciul exact)
