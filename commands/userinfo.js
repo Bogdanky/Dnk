@@ -15,6 +15,13 @@ const FLAG_LABELS = {
     ActiveDeveloper: 'Dezvoltator Activ',
 };
 
+const STATUS_LABELS = {
+    online: '🟢 Online',
+    idle: '🌙 Idle',
+    dnd: '⛔ Nu deranja',
+    offline: '⚫ Offline / Invizibil',
+};
+
 const KEY_PERMISSIONS = [
     'Administrator',
     'ManageGuild',
@@ -36,7 +43,9 @@ module.exports = {
                 .setRequired(false)),
 
     async execute(interaction) {
-        const user = interaction.options.getUser('utilizator') ?? interaction.user;
+        const targetUser = interaction.options.getUser('utilizator') ?? interaction.user;
+        // force:true e necesar ca sa vina si campul de banner - din cache normal, Discord.js nu il include.
+        const user = await interaction.client.users.fetch(targetUser.id, { force: true }).catch(() => targetUser);
         const member = await interaction.guild?.members.fetch(user.id).catch(() => null);
 
         const createdTs = Math.floor(user.createdTimestamp / 1000);
@@ -52,6 +61,10 @@ module.exports = {
                 { name: 'Cont creat la', value: `<t:${createdTs}:F> (<t:${createdTs}:R>)` },
             );
 
+        if (user.bannerURL()) {
+            embed.setImage(user.bannerURL({ size: 512 }));
+        }
+
         if (member) {
             const joinedTs = member.joinedTimestamp ? Math.floor(member.joinedTimestamp / 1000) : null;
 
@@ -59,6 +72,19 @@ module.exports = {
                 { name: 'Nickname', value: member.nickname ?? 'Fara nickname', inline: true },
                 { name: 'A intrat pe server la', value: joinedTs ? `<t:${joinedTs}:F> (<t:${joinedTs}:R>)` : 'Necunoscut' },
             );
+
+            const status = member.presence?.status ?? 'offline';
+            const activity = member.presence?.activities?.find(a => a.type !== 4)?.name; // type 4 = custom status, il tratam separat
+            const customStatus = member.presence?.activities?.find(a => a.type === 4)?.state;
+
+            let presenceValue = STATUS_LABELS[status] ?? status;
+            if (activity) presenceValue += `\n🎮 ${activity}`;
+            if (customStatus) presenceValue += `\n💬 ${customStatus}`;
+            embed.addFields({ name: 'Status', value: presenceValue, inline: true });
+
+            if (member.voice?.channel) {
+                embed.addFields({ name: '🔊 In voice', value: `${member.voice.channel}`, inline: true });
+            }
 
             const roles = member.roles.cache
                 .filter(role => role.id !== interaction.guild.id)

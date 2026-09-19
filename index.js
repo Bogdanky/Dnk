@@ -18,6 +18,7 @@ const { getRoleForReaction } = require('./reaction-role-store');
 const { getStarboardEntry, setStarboardEntry } = require('./starboard-store');
 const { prefixCommands } = require('./prefix-commands');
 const { refreshStandingsMessage } = require('./f1-standings');
+const { checkAllSocialUpdates } = require('./social-poller');
 
 const client = new Client({
     intents: [
@@ -26,9 +27,11 @@ const client = new Client({
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
         GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildPresences,
         // Neprivilegiate, dar tot trebuie declarate:
         GatewayIntentBits.GuildModeration,
         GatewayIntentBits.GuildMessageReactions,
+        GatewayIntentBits.GuildVoiceStates,
     ],
     partials: [Partials.Message, Partials.Reaction, Partials.User, Partials.GuildMember],
 });
@@ -70,6 +73,12 @@ client.once('clientReady', () => {
             console.error(`Eroare la actualizarea clasamentului F1 pentru serverul ${guildId}:`, error),
         );
     }
+
+    // Verifica din 10 in 10 minute daca sunt clipuri noi pe canalele YouTube/conturile TikTok urmarite.
+    checkAllSocialUpdates(client).catch(error => console.error('Eroare la prima verificare social media:', error));
+    setInterval(() => {
+        checkAllSocialUpdates(client).catch(error => console.error('Eroare la verificarea social media:', error));
+    }, 10 * 60 * 1000);
     setInterval(async () => {
         console.log('🔄 Auto-restart dupa 1 ora - deconectez si reconectez...');
         try {

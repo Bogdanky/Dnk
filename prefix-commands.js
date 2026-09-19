@@ -64,4 +64,60 @@ prefixCommands.set('help', {
     },
 });
 
+prefixCommands.set('random', {
+    description: 'Imagine random (mix: catel, pisica, meme, sau anime)',
+    async execute(message) {
+        const sources = [
+            {
+                emoji: '🐶', label: 'Catel',
+                async fetchUrl() {
+                    const res = await fetch('https://dog.ceo/api/breeds/image/random');
+                    const data = await res.json();
+                    return data.message;
+                },
+            },
+            {
+                emoji: '🐱', label: 'Pisica',
+                async fetchUrl() {
+                    const res = await fetch('https://api.thecatapi.com/v1/images/search');
+                    const [data] = await res.json();
+                    return data.url;
+                },
+            },
+            {
+                emoji: '😂', label: 'Meme',
+                async fetchUrl() {
+                    const res = await fetch('https://meme-api.com/gimme');
+                    const data = await res.json();
+                    return data.url;
+                },
+            },
+            {
+                emoji: '🎨', label: 'Anime',
+                async fetchUrl() {
+                    const res = await fetch('https://nekos.best/api/v2/neko', {
+                        headers: { 'User-Agent': 'DnkBot/1.0 (https://discord.com)' },
+                    });
+                    const data = await res.json();
+                    return data.results[0].url;
+                },
+            },
+        ];
+
+        const picked = sources[Math.floor(Math.random() * sources.length)];
+
+        try {
+            const url = await picked.fetchUrl();
+            const embed = new EmbedBuilder()
+                .setTitle(`${picked.emoji} ${picked.label} random`)
+                .setImage(url)
+                .setColor(0xFF9900);
+            await message.reply({ embeds: [embed] });
+        } catch (error) {
+            console.error('Eroare la !random:', error);
+            await message.reply('Nu am putut aduce o imagine acum, mai incearca o data.');
+        }
+    },
+});
+
 module.exports = { prefixCommands };

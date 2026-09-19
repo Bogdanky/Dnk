@@ -12,19 +12,32 @@ async function steamJson(url) {
 
 async function getLowestPrice(appId) {
     try {
-        // CheapShark oferă căutare directă după Steam App ID
-        const response = await fetch(`https://www.cheapshark.com/api/1.0/games?steamAppID=${appId}`, {
+        // Pasul 1: cauta jocul dupa steamAppID ca sa aflam gameID-ul INTERN CheapShark
+        // (steamAppID si gameID sunt lucruri diferite in CheapShark).
+        const searchResponse = await fetch(`https://www.cheapshark.com/api/1.0/games?steamAppID=${appId}`, {
             signal: AbortSignal.timeout(4000)
         });
-        
-        if (!response.ok) return 'Indisponibil';
-        
-        const data = await response.json();
-        // CheapShark returnează un array; luăm primul rezultat (meciul exact)
-        if (data && data.length > 0 && data[0].cheapestPriceEver) {
-            return `$${data[0].cheapestPriceEver.price}`;
+
+        if (!searchResponse.ok) return 'Indisponibil';
+
+        const searchResults = await searchResponse.json();
+        const gameId = searchResults?.[0]?.gameID;
+        if (!gameId) return 'Nedisponibil';
+
+        // Pasul 2: abia endpoint-ul "games?id=<gameID>" contine cheapestPriceEver.
+        // Endpoint-ul de cautare de mai sus NU il contine niciodata, indiferent de joc -
+        // asta era bug-ul: cheapestPriceEver era mereu undefined pe rezultatele de cautare.
+        const detailsResponse = await fetch(`https://www.cheapshark.com/api/1.0/games?id=${gameId}`, {
+            signal: AbortSignal.timeout(4000)
+        });
+
+        if (!detailsResponse.ok) return 'Indisponibil';
+
+        const details = await detailsResponse.json();
+        if (details?.cheapestPriceEver?.price) {
+            return `$${details.cheapestPriceEver.price}`;
         }
-        
+
         return 'Nedisponibil';
     } catch (_) {
         return 'Nedisponibil';
@@ -83,7 +96,7 @@ module.exports = {
                 .setDescription(description)
                 .addFields(
                     { name: 'Preț', value: price, inline: true },
-                    { name: 'Past price', value: pastPrice, inline: true },
+                    { name: 'Cel mai mic preț (istoric)', value: pastPrice, inline: true },
                     { name: 'Reviews', value: reviews, inline: true },
                     { name: 'Metascore', value: metascore, inline: true }
                 )
