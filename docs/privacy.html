@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — Dnk Bot</title>
+<style>
+    :root {
+        --accent: #FF9900;
+        --bg: #0f0f10;
+        --card: #17171a;
+        --text: #e8e8e8;
+        --muted: #9a9a9a;
+        --border: #2a2a2e;
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.7;
+    }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+    header { text-align: center; margin-bottom: 40px; }
+    header img { max-width: 220px; height: auto; margin-bottom: 16px; }
+    h1 { font-size: 1.9rem; margin: 0 0 4px; color: var(--accent); }
+    .subtitle { color: var(--muted); font-size: 0.95rem; }
+    h2 {
+        color: var(--accent);
+        font-size: 1.25rem;
+        margin-top: 40px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 8px;
+    }
+    p, li { color: var(--text); }
+    ul { padding-left: 22px; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px 24px;
+        margin-top: 16px;
+    }
+    footer {
+        margin-top: 56px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.85rem;
+        border-top: 1px solid var(--border);
+        padding-top: 24px;
+    }
+    .updated { color: var(--muted); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+    <header>
+        <img src="assets/logo.png" alt="Dnk Bot">
+        <h1>Politica de Confidențialitate</h1>
+        <div class="subtitle">Dnk Bot — bot Discord</div>
+    </header>
+
+    <p class="updated">Ultima actualizare: 20 septembrie 2026</p>
+
+    <p>
+        Această pagină explică ce date colectează botul <strong>Dnk</strong> (denumit "Botul") atunci
+        când e adăugat pe un server Discord, cum sunt folosite acele date, și ce drepturi ai în legătură
+        cu ele. Botul e un proiect personal, non-comercial, dezvoltat și întreținut de un singur
+        dezvoltator — nu o companie.
+    </p>
+
+    <h2>1. Ce date colectează Botul</h2>
+    <div class="card">
+        <ul>
+            <li><strong>ID-uri și tag-uri de utilizator Discord</strong> — pentru a identifica cine a rulat o comandă, cine a primit un avertisment, cine deține un tichet etc.</li>
+            <li><strong>ID-uri și nume de server (guild)</strong> — pentru a ține configurarea separată pentru fiecare server (roluri, canale, praguri, prefix).</li>
+            <li><strong>Conținutul mesajelor</strong> — citit doar pentru a detecta imagini care trebuie verificate de filtrul automat NSFW; conținutul mesajelor <u>nu este stocat</u>, doar procesat în momentul trimiterii.</li>
+            <li><strong>Avertismente de moderare</strong> — motiv, moderator, dată — asociate cu ID-ul utilizatorului avertizat.</li>
+            <li><strong>Configurări per server</strong> — canale setate pentru tichete, log-uri, welcome, starboard, F1, notificări YouTube/TikTok/UTCN.</li>
+            <li><strong>Liste de urmărire</strong> — ID-uri de canale YouTube, username-uri TikTok, sau URL-uri de pagini UTCN pe care un admin a ales să le urmărească pentru notificări (acestea sunt conturi/pagini publice, nu date personale ale membrilor serverului).</li>
+        </ul>
+    </div>
+
+    <h2>2. Ce NU colectează Botul</h2>
+    <div class="card">
+        <ul>
+            <li>Parole, date de plată, sau orice informație financiară.</li>
+            <li>Adrese IP ale utilizatorilor Discord (independent de logurile tehnice standard pe care le poate păstra automat platforma de hosting).</li>
+            <li>Mesaje private (DM-uri) — Botul nu are acces la conversații private.</li>
+            <li>Conținutul mesajelor obișnuite (text) — doar imaginile atașate sunt verificate, și doar dacă filtrul NSFW e activat de un admin.</li>
+        </ul>
+    </div>
+
+    <h2>3. Cui îi trimitem date</h2>
+    <p>Pentru unele funcții, Botul trimite date către servicii externe, strict cât e nevoie ca funcția să funcționeze:</p>
+    <div class="card">
+        <ul>
+            <li><strong>RapidAPI (api4ai/nsfw3)</strong> — primește doar URL-ul unei imagini postate, pentru a verifica dacă e conținut NSFW. Nu trimitem identitatea utilizatorului.</li>
+            <li><strong>Steam, FiveM, Jolpica-F1 (date F1)</strong> — primesc doar termenul de căutare sau adresa de server introdusă în comandă, fără date despre utilizatorul Discord.</li>
+            <li><strong>YouTube (feed RSS public), TikTok, paginile de anunțuri UTCN</strong> — Botul doar citește pagini publice; nu transmite date despre utilizatori acestor servicii.</li>
+        </ul>
+    </div>
+
+    <h2>4. Unde sunt stocate datele</h2>
+    <p>
+        Toate datele persistente (configurări, avertismente, liste de urmărire) sunt stocate în fișiere
+        simple pe serverul unde rulează Botul (găzduit pe bot-hosting.net). Nu folosim baze de date în
+        cloud și nu vindem sau distribuim datele către terți în scopuri comerciale.
+    </p>
+
+    <h2>5. Cât timp păstrăm datele</h2>
+    <p>
+        Datele unui server rămân stocate cât timp Botul e prezent pe acel server. Dacă un admin
+        elimină Botul de pe server, sau dacă cere explicit ștergerea datelor, acestea sunt șterse.
+    </p>
+
+    <h2>6. Drepturile tale</h2>
+    <p>
+        Poți cere oricând ștergerea datelor asociate contului tău sau serverului tău, sau întrebări
+        despre ce date sunt stocate, contactând dezvoltatorul (vezi secțiunea de Contact mai jos).
+    </p>
+
+    <h2>7. Vârsta minimă</h2>
+    <p>
+        Discord impune o vârstă minimă de 13 ani pentru utilizarea platformei. Botul nu colectează
+        intenționat date suplimentare despre minori dincolo de ce oferă Discord API în mod standard.
+    </p>
+
+    <h2>8. Modificări ale acestei politici</h2>
+    <p>
+        Această politică poate fi actualizată pe măsură ce Botul primește funcții noi. Data ultimei
+        actualizări apare mereu în partea de sus a paginii.
+    </p>
+
+    <h2>Contact</h2>
+    <div class="card">
+        <p>Pentru orice întrebare legată de date sau confidențialitate:</p>
+        <ul>
+            <li>Discord: <strong>Bogdanky</strong></li>
+            <li>GitHub Issues: <a href="https://github.com/Bogdanky/Dnk/issues">github.com/Bogdanky/Dnk/issues</a></li>
+        </ul>
+    </div>
+
+    <footer>
+        Dnk Bot — proiect personal, non-comercial · <a href="terms.html">Terms of Service</a>
+    </footer>
+</div>
+</body>
+</html>
