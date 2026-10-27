@@ -1,28 +1,14 @@
-const fs = require('node:fs');
 const path = require('node:path');
+const { readJson, writeJsonAtomic } = require('./json-store');
 
-const dataDir = path.join(__dirname, 'data');
-const storePath = path.join(dataDir, 'warns.json');
-
-function loadAll() {
-    try {
-        const raw = fs.readFileSync(storePath, 'utf8');
-        return JSON.parse(raw);
-    } catch {
-        return {};
-    }
-}
-
-function saveAll(data) {
-    fs.mkdirSync(dataDir, { recursive: true });
-    fs.writeFileSync(storePath, JSON.stringify(data, null, 2));
-}
+const storePath = path.join(__dirname, 'data', 'warns.json');
+function loadAll() { return readJson(storePath, {}); }
+function saveAll(data) { writeJsonAtomic(storePath, data); }
 
 function getWarns(guildId, userId) {
     const all = loadAll();
     return all[guildId]?.[userId] ?? [];
 }
-
 function addWarn(guildId, userId, warn) {
     const all = loadAll();
     if (!all[guildId]) all[guildId] = {};
@@ -31,7 +17,6 @@ function addWarn(guildId, userId, warn) {
     saveAll(all);
     return all[guildId][userId];
 }
-
 function removeWarn(guildId, userId, index) {
     const all = loadAll();
     const warns = all[guildId]?.[userId];
@@ -40,5 +25,4 @@ function removeWarn(guildId, userId, index) {
     saveAll(all);
     return removed;
 }
-
 module.exports = { getWarns, addWarn, removeWarn };

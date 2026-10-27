@@ -7,7 +7,7 @@ Ghid operational pentru pornirea, oprirea si depanarea botului.
 ```bash
 git clone https://github.com/Bogdanky/Dnk.git
 cd Dnk
-npm install
+npm ci
 cp .env.example .env
 ```
 
@@ -77,7 +77,7 @@ Lipseste un intent privilegiat activat in Developer Portal -> Bot:
 1. Verifica ca `RAPIDAPI_KEY` e completat corect in `.env` si ca esti abonat (macar planul gratuit) la api4ai/nsfw3 pe RapidAPI.
 2. Verifica ca Message Content Intent e activat (fara el, botul nu vede atasamentele).
 3. Verifica ca acel canal nu e deja marcat "Age-Restricted (NSFW)" in Discord - acolo filtrul e ignorat intentionat.
-4. Pragul de detectie e 0.85 (strict) - o imagine sugestiva dar nu explicita poate sa nu il depaseasca.
+4. Pragul de detectie din implementare este 0.60 - o imagine sugestiva dar nu explicita poate sa nu il depaseasca.
 
 ### `git add .` da `fatal: not a git repository`
 
@@ -100,6 +100,13 @@ nslookup numedomeniu.com 8.8.8.8
 ```
 
 Daca merge cu DNS explicit (8.8.8.8) dar nu cu cel implicit, schimba DNS-ul din Windows (Network Settings -> adaptor -> IPv4 -> DNS manual: `8.8.8.8` / `8.8.4.4`) si ruleaza `ipconfig /flushdns`.
+
+## Validari de securitate
+
+- Comanda `/fivem` accepta doar IPv4 public si port numeric; hostname-urile, adresele private/rezerate si URL-urile complete sunt respinse.
+- Comanda `/utcn` accepta doar URL-uri HTTPS de pe domeniul oficial `utcluj.ro` sau subdomeniile sale; redirectionarile sunt respinse.
+- Comenzile administrative verifica permisiunile in runtime, nu doar in setarile implicite ale slash command-urilor.
+- Fisierele JSON corupte nu mai sunt tratate ca magazine goale. Verifica logurile si restaureaza un backup inainte de a repara manual fisierul.
 
 ## Backup
 

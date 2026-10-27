@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits, ChannelType } = require('discord.js');
 const { addYoutubeWatch, removeYoutubeWatch, getGuildWatches, setYoutubeLastVideo } = require('../notify-store');
 const { extractChannelIdFromUrl, fetchLatestVideo } = require('../youtube-watcher');
+const { requirePermission } = require('../command-guard');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -25,6 +26,7 @@ module.exports = {
                 .setDescription('Lista canalelor YouTube urmarite pe acest server')),
 
     async execute(interaction) {
+        if (!await requirePermission(interaction, PermissionFlagsBits.Administrator, 'Administrator')) return;
         const sub = interaction.options.getSubcommand();
         const guildId = interaction.guild.id;
 

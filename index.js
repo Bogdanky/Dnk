@@ -15,7 +15,7 @@ const { getGuildConfig, getAllGuildIds } = require('./config-store');
 const { isImageNsfw } = require('./nsfw-filter');
 const { sendLog, baseEmbed, fetchExecutor } = require('./audit-log');
 const { getRoleForReaction } = require('./reaction-role-store');
-const { getStarboardEntry, setStarboardEntry } = require('./starboard-store');
+const { getStarboardEntry, setStarboardEntry, removeStarboardEntry } = require('./starboard-store');
 const { prefixCommands } = require('./prefix-commands');
 const { refreshStandingsMessage } = require('./f1-standings');
 const { checkAllSocialUpdates } = require('./social-poller');
@@ -64,7 +64,7 @@ client.once('clientReady', () => {
     // Verifica din 30 in 30 de secunde daca vreun giveaway a expirat si trebuie incheiat automat.
     const giveawayCommand = client.commands.get('giveaway');
     if (giveawayCommand?.checkExpiredGiveaways) {
-        setInterval(() => giveawayCommand.checkExpiredGiveaways(client), 30_000);
+        setInterval(() => giveawayCommand.checkExpiredGiveaways(client).catch(error => console.error('Eroare la verificarea giveaway-urilor expirate:', error)), 30_000);
     }
 
     // La fiecare pornire/restart, actualizeaza (sterge + reposteaza) clasamentul F1 pe fiecare server configurat.
@@ -75,22 +75,20 @@ client.once('clientReady', () => {
     }
 
     // Verifica din 10 in 10 minute daca sunt clipuri noi pe canalele YouTube/conturile TikTok urmarite.
-    checkAllSocialUpdates(client).catch(error => console.error('Eroare la prima verificare social media:', error));
-    setInterval(() => {
-        checkAllSocialUpdates(client).catch(error => console.error('Eroare la verificarea social media:', error));
-    }, 10 * 60 * 1000);
-    setInterval(async () => {
-        console.log('🔄 Auto-restart dupa 1 ora - deconectez si reconectez...');
+    let socialPollInProgress = false;
+    const runSocialPoll = async () => {
+        if (socialPollInProgress) return;
+        socialPollInProgress = true;
         try {
-            await client.destroy();
-            // Asteapta 2 secunde, apoi reconnect
-            setTimeout(() => {
-                client.login(process.env.DISCORD_TOKEN);
-            }, 2000);
+            await checkAllSocialUpdates(client);
         } catch (error) {
-            console.error('Eroare la auto-restart:', error);
+            console.error('Eroare la verificarea social media:', error);
+        } finally {
+            socialPollInProgress = false;
         }
-    }, 3600000);
+    };
+    void runSocialPoll();
+    setInterval(() => { void runSocialPoll(); }, 10 * 60 * 1000);
 });
 
 // ---------- Slash commands + butonul de tichet ----------
@@ -274,7 +272,17 @@ async function handleStarboard(message) {
 
     const starReaction = message.reactions.cache.get('⭐');
     const count = starReaction?.count ?? 0;
-    if (count < starThreshold) return;
+    if (count < starThreshold) {
+        const existingId = getStarboardEntry(message.id);
+        if (existingId) {
+            const existing = await client.channels.fetch(starboardChannelId)
+                .then(channel => channel.messages.fetch(existingId))
+                .catch(() => null);
+            if (existing) await existing.delete().catch(error => console.error('Nu am putut retrage mesajul din starboard:', error));
+            removeStarboardEntry(message.id);
+        }
+        return;
+    }
 
     const starboardChannel = await message.client.channels.fetch(starboardChannelId).catch(() => null);
     if (!starboardChannel) return;

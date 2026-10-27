@@ -13,7 +13,7 @@ module.exports = {
     async execute(interaction) {
         // Doar owner-ul botului poate folosi /reload, ca sa nu umble oricine pe server cu asta.
         const ownerId = process.env.OWNER_ID;
-        if (ownerId && interaction.user.id !== ownerId) {
+        if (!ownerId || interaction.user.id !== ownerId) {
             return interaction.reply({ content: 'Doar owner-ul botului poate folosi aceasta comanda.', ephemeral: true });
         }
 

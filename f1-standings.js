@@ -6,8 +6,8 @@ const MEDALS = ['🥇', '🥈', '🥉'];
 
 async function fetchStandings() {
     const [driverRes, constructorRes] = await Promise.all([
-        fetch(`${BASE_URL}/current/driverStandings.json`),
-        fetch(`${BASE_URL}/current/constructorStandings.json`),
+        fetch(`${BASE_URL}/current/driverStandings.json`, { signal: AbortSignal.timeout(8000) }),
+        fetch(`${BASE_URL}/current/constructorStandings.json`, { signal: AbortSignal.timeout(8000) }),
     ]);
 
     if (!driverRes.ok || !constructorRes.ok) {
@@ -79,13 +79,25 @@ async function refreshStandingsMessage(client, guildId) {
 
     if (f1StandingsMessageId) {
         const oldMessage = await channel.messages.fetch(f1StandingsMessageId).catch(() => null);
-        if (oldMessage) await oldMessage.delete().catch(() => {});
+        if (oldMessage) {
+            try {
+                await oldMessage.edit({ embeds: [embed] });
+                return { ok: true };
+            } catch (error) {
+                console.error('Eroare la actualizarea mesajului de clasament F1:', error);
+                return { ok: false, reason: 'post-failed' };
+            }
+        }
     }
 
-    const newMessage = await channel.send({ embeds: [embed] });
-    setGuildConfig(guildId, { f1StandingsMessageId: newMessage.id });
-
-    return { ok: true };
+    try {
+        const newMessage = await channel.send({ embeds: [embed] });
+        setGuildConfig(guildId, { f1StandingsMessageId: newMessage.id });
+        return { ok: true };
+    } catch (error) {
+        console.error('Eroare la publicarea clasamentului F1:', error);
+        return { ok: false, reason: 'post-failed' };
+    }
 }
 
 module.exports = { refreshStandingsMessage };

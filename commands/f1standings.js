@@ -1,4 +1,5 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const { requirePermission } = require('../command-guard');
 const { refreshStandingsMessage } = require('../f1-standings');
 
 const ERROR_MESSAGES = {
@@ -10,9 +11,11 @@ const ERROR_MESSAGES = {
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('f1standings')
-        .setDescription('Actualizeaza manual mesajul cu clasamentul F1 (sterge-l pe cel vechi, posteaza unul nou)'),
+        .setDescription('Actualizeaza manual mesajul cu clasamentul F1')
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
     async execute(interaction) {
+        if (!await requirePermission(interaction, PermissionFlagsBits.Administrator, 'Administrator')) return;
         await interaction.deferReply({ ephemeral: true });
 
         const result = await refreshStandingsMessage(interaction.client, interaction.guild.id);
