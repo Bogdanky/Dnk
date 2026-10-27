@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main, improve/security-reliability]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [22, 24]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm test
+      - name: Check JavaScript syntax
+        run: |
+          find . -path ./node_modules -prune -o -name '*.js' -type f -print0 | xargs -0 -n1 node --check
