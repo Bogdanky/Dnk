@@ -31,7 +31,7 @@ Bot Discord modern, construit cu **discord.js v14**, rescris de la zero dintr-un
 
 ## Cerinte
 
-- [Node.js](https://nodejs.org) 18 sau mai nou (dezvoltat si testat pe Node 22)
+- [Node.js](https://nodejs.org) 22 sau 24 (versiunile acceptate sunt definite in package.json)
 - O aplicatie Discord + bot creat in [Discord Developer Portal](https://discord.com/developers/applications)
 - (Optional) cont [RapidAPI](https://rapidapi.com) pentru filtrul NSFW
 
@@ -98,8 +98,9 @@ Trebuie activate manual in Developer Portal -> aplicatia ta -> **Bot**:
 
 - **Message Content Intent** - necesar pentru filtrul NSFW (citirea atasamentelor) si prefix commands
 - **Server Members Intent** - necesar pentru welcome/autorole si audit log la kick/plecare
+- **Presence Intent** - folosit de `/userinfo` pentru starea online si activitatile membrilor
 
-Fara ele, botul nu se conecteaza deloc (Discord respinge intent-urile nedeclarate ca activate).
+Activeaza in Developer Portal toate intent-urile privilegiate solicitate de configuratia curenta. Daca dezactivezi un intent in cod, elimina si dependintele de functiile asociate.
 
 ## Lista completa de comenzi
 
@@ -122,6 +123,9 @@ Fara ele, botul nu se conecteaza deloc (Discord respinge intent-urile nedeclarat
 | `/userinfo` | Info detaliate despre un utilizator (roluri, cont, permisiuni, insigne) |
 | `/server` | Info despre serverul curent |
 | `/minecraft` | Status server Minecraft (mcstatus.io) |
+| `/fivem status` | Status server FiveM dupa IP public si port |
+| `/fivem players` | Lista jucatorilor conectati pe un server FiveM |
+| `/fivem check` | Cauta un jucator conectat dupa nume sau identificator |
 | `/invite` | Buton cu link-ul de invitatie al botului |
 
 ### Moderare
@@ -132,6 +136,13 @@ Fara ele, botul nu se conecteaza deloc (Discord respinge intent-urile nedeclarat
 | `/warn add\|list\|remove` | Avertismente, auto-kick la 3 | Moderate Members |
 | `/automod nsfw-filter` | Porneste/opreste filtrul NSFW | Administrator |
 | `/reactionrole add\|remove` | Roluri prin reactie | Manage Roles |
+
+### Notificari
+| Comanda | Descriere |
+|---|---|
+| `/youtube add\|remove\|list` | Notificari pentru upload-uri noi pe YouTube |
+| `/tiktok add\|remove\|list` | Monitorizare clipuri TikTok publice (metoda neoficiala) |
+| `/utcn add\|remove\|list` | Notificari pentru anunturi de pe domeniile oficiale UTCN |
 
 ### Tichete
 | Comanda | Descriere |
@@ -154,8 +165,8 @@ Fara ele, botul nu se conecteaza deloc (Discord respinge intent-urile nedeclarat
 | `/config log-channel` | Canal pentru audit log |
 | `/config starboard` | Canal + prag pentru starboard |
 | `/config prefix` | Prefixul pentru prefix commands |
-| `/f1standings setup canal` | Configureaza canalul si posteaza clasamentul F1 (Admin) |
-| `/f1standings refresh` | Actualizeaza manual clasamentul F1 (Admin) |
+| `/config f1-channel canal` | Configureaza canalul pentru clasamentul F1 (Admin) |
+| `/f1standings` | Actualizeaza manual clasamentul F1 (Admin) |
 | `/config show` | Afiseaza toata configuratia curenta |
 
 ### Dezvoltare (owner only)

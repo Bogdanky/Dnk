@@ -1,33 +1,20 @@
-const fs = require('node:fs');
 const path = require('node:path');
+const { readJson, writeJsonAtomic } = require('./json-store');
+const storePath = path.join(__dirname, 'data', 'starboard.json');
 
-const dataDir = path.join(__dirname, 'data');
-const storePath = path.join(dataDir, 'starboard.json');
-
-function loadAll() {
-    try {
-        const raw = fs.readFileSync(storePath, 'utf8');
-        return JSON.parse(raw);
-    } catch {
-        return {};
-    }
-}
-
-function saveAll(data) {
-    fs.mkdirSync(dataDir, { recursive: true });
-    fs.writeFileSync(storePath, JSON.stringify(data, null, 2));
-}
-
-// originalMessageId -> ID-ul mesajului postat pe canalul de starboard.
-function getStarboardEntry(originalMessageId) {
-    const all = loadAll();
-    return all[originalMessageId] ?? null;
-}
-
+function loadAll() { return readJson(storePath, {}); }
+function saveAll(data) { writeJsonAtomic(storePath, data); }
+function getStarboardEntry(originalMessageId) { return loadAll()[originalMessageId] ?? null; }
 function setStarboardEntry(originalMessageId, starboardMessageId) {
     const all = loadAll();
     all[originalMessageId] = starboardMessageId;
     saveAll(all);
 }
-
-module.exports = { getStarboardEntry, setStarboardEntry };
+function removeStarboardEntry(originalMessageId) {
+    const all = loadAll();
+    if (!(originalMessageId in all)) return false;
+    delete all[originalMessageId];
+    saveAll(all);
+    return true;
+}
+module.exports = { getStarboardEntry, setStarboardEntry, removeStarboardEntry };

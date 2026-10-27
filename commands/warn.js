@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const { getWarns, addWarn, removeWarn } = require('../warn-store');
 const { sendLog, baseEmbed } = require('../audit-log');
+const { requirePermission } = require('../command-guard');
 
 const AUTO_KICK_THRESHOLD = 3;
 
@@ -12,6 +13,13 @@ async function warnAdd(interaction) {
         return interaction.reply({ content: 'Nu te poti avertiza singur.', ephemeral: true });
     }
 
+    const targetMember = await interaction.guild.members.fetch(target.id).catch(() => null);
+    if (!targetMember) return interaction.reply({ content: 'Membrul nu mai este pe acest server.', ephemeral: true });
+    const moderatorMember = await interaction.guild.members.fetch(interaction.user.id);
+    if (interaction.user.id !== interaction.guild.ownerId && targetMember.roles.highest.position >= moderatorMember.roles.highest.position) {
+        return interaction.reply({ content: 'Nu poti modera un membru cu rol egal sau superior celui mai inalt rol al tau.', ephemeral: true });
+    }
+
     const warns = addWarn(interaction.guild.id, target.id, {
         reason,
         moderatorId: interaction.user.id,
@@ -20,6 +28,7 @@ async function warnAdd(interaction) {
 
     await interaction.reply({
         content: `⚠️ ${target} a primit un avertisment (${warns.length}/${AUTO_KICK_THRESHOLD}).\n**Motiv:** ${reason}`,
+        allowedMentions: { users: [target.id], parse: [] },
     });
 
     await sendLog(interaction.client, interaction.guild.id, baseEmbed('⚠️ Avertisment nou', 0xFEE75C)
@@ -35,7 +44,7 @@ async function warnAdd(interaction) {
 
         if (member?.kickable) {
             await member.kick(`Auto-kick: a atins ${AUTO_KICK_THRESHOLD} avertismente`);
-            await interaction.followUp(`🥾 ${target} a atins ${AUTO_KICK_THRESHOLD} avertismente si a fost dat afara automat.`);
+            await interaction.followUp({ content: `🥾 ${target} a atins ${AUTO_KICK_THRESHOLD} avertismente si a fost dat afara automat.`, allowedMentions: { users: [target.id], parse: [] } });
             await sendLog(interaction.client, interaction.guild.id, baseEmbed('🥾 Kick automat', 0xED4245)
                 .addFields({ name: 'Membru', value: `${target} (${target.id})` }, { name: 'Motiv', value: `A atins ${AUTO_KICK_THRESHOLD} avertismente` }));
         } else {
@@ -96,6 +105,7 @@ module.exports = {
                 .addIntegerOption(opt => opt.setName('index').setDescription('Indexul avertismentului (vezi /warn list)').setRequired(true).setMinValue(0))),
 
     async execute(interaction) {
+        if (!await requirePermission(interaction, PermissionFlagsBits.ModerateMembers, 'Moderate Members')) return;
         const sub = interaction.options.getSubcommand();
         if (sub === 'add') return warnAdd(interaction);
         if (sub === 'list') return warnList(interaction);

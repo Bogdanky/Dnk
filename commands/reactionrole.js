@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
-const { addMapping, removeMapping, getMappingsForMessage } = require('../reaction-role-store');
+const { addMapping, removeMapping } = require('../reaction-role-store');
+const { requirePermission } = require('../command-guard');
 
 function parseEmojiKey(input) {
     const customMatch = input.trim().match(/^<a?:\w+:(\d+)>$/);
@@ -25,6 +26,7 @@ module.exports = {
                 .addStringOption(opt => opt.setName('emoji').setDescription('Emoji-ul de sters').setRequired(true))),
 
     async execute(interaction) {
+        if (!await requirePermission(interaction, PermissionFlagsBits.ManageRoles, 'Manage Roles')) return;
         const sub = interaction.options.getSubcommand();
         const messageId = interaction.options.getString('mesaj_id', true);
         const emojiInput = interaction.options.getString('emoji', true);
@@ -42,11 +44,16 @@ module.exports = {
             const role = interaction.options.getRole('rol', true);
 
             const botMember = await interaction.guild.members.fetchMe();
-            if (role.position >= botMember.roles.highest.position) {
+            if (role.managed || role.id === interaction.guild.id || role.position >= botMember.roles.highest.position) {
                 return interaction.reply({
                     content: `Nu pot atribui rolul ${role} - e mai sus (sau la fel de sus) decat rolul botului.`,
                     ephemeral: true,
                 });
+            }
+
+            const moderatorMember = await interaction.guild.members.fetch(interaction.user.id);
+            if (role.position >= moderatorMember.roles.highest.position && interaction.user.id !== interaction.guild.ownerId) {
+                return interaction.reply({ content: 'Nu poti configura un rol egal sau superior celui mai inalt rol al tau.', ephemeral: true });
             }
 
             try {

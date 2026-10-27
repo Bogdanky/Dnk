@@ -14,6 +14,7 @@ async function isImageNsfw(imageUrl) {
 
     const response = await fetch(`https://${RAPIDAPI_HOST}/v1/results?strictness=1.0`, {
         method: 'POST',
+        signal: AbortSignal.timeout(10000),
         headers: {
             'X-RapidAPI-Key': apiKey,
             'X-RapidAPI-Host': RAPIDAPI_HOST,
